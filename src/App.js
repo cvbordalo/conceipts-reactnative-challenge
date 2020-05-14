@@ -21,7 +21,19 @@ export default function App() {
   }, []);
 
   async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
+    const response = await api.post(`repositories/${id}/like`);
+
+    const likedRepository = response.data;
+
+    const repositoriesUpdated = repositories.map(repository => {
+      if (repository.id === id) {
+        return likedRepository;
+      } else {
+        return repository;
+      }
+    });
+
+    setRepositories(repositoriesUpdated);
   }
 
   return (
@@ -36,9 +48,9 @@ export default function App() {
               <Text style={styles.repository}>{repository.title}</Text>
 
               <View style={styles.techsContainer}>
-                {repository.techs.map(tech =< (
+                {repository.techs.map(tech => (
                   <Text key={tech} style={styles.tech}>
-                   ReactJS
+                   {tech}
                   </Text>
                 ))}
               </View>
@@ -48,13 +60,13 @@ export default function App() {
                   style={styles.likeText}
                   testID={`repository-likes-${repository.id}`}
                 >
-                  {repository.likes} curtidas
+                  {repository.likes} curtida{repository.likes > 1 ? 's' : ''}
                 </Text>
               </View>
 
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleLikeRepository(1)}
+                onPress={() => handleLikeRepository(repository.id)}
                 testID={`like-button-${repository.id}`}
               >
                 <Text style={styles.buttonText}>Curtir</Text>
@@ -74,6 +86,7 @@ const styles = StyleSheet.create({
   },
   repositoryContainer: {
     marginBottom: 15,
+    marginTop: 15,
     marginHorizontal: 15,
     backgroundColor: "#fff",
     padding: 20,
